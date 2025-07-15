@@ -1,40 +1,46 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
+     SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, ListTodo, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, ClipboardList, ListTodo, Folder, 
+    LayoutGrid, FileText, UserCog, ShieldCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
-        icon: LayoutGrid,
+        icon: LayoutGrid, 
     },
     {
         title: 'Posts',
         href: '/posts',
-        icon: LayoutGrid,
+        icon: FileText, 
     },
     {
         title: 'Lists',
         href: '/lists',
-        icon: ClipboardList,
+        icon: ClipboardList, 
     },
     {
         title: 'Tasks',
         href: '/tasks',
-        icon: ListTodo,
+        icon: ListTodo, 
     },
     {
         title: 'Permissions',
         href: '/permissions',
-        icon: ListTodo,
+        icon: ShieldCheck, 
+    },
+    {
+        title: 'Role',
+        href: '/roles',
+        icon: UserCog, // UserCog or Users for user roles/groups
     },
 ];
-
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',

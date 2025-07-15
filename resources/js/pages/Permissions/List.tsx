@@ -1,37 +1,26 @@
-import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { usePage, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 
-
 const PermissionsPage = () => {
-    const [permissions, setPermissions] = useState([]);
-    const [canCreate, setCanCreate] = useState(false);
-    const [canEdit, setCanEdit] = useState(false);
-    const [canDelete, setCanDelete] = useState(false);
+    const { props } = usePage();
 
-    useEffect(() => {
-        fetchPermissions();
-    }, []);
+    const permissions = props.permissions || {};
+    const flash = props.flash || {};
 
-    const fetchPermissions = async () => {
-        try {
-            const response = await axios.get('/api/permissions'); // Adjust to your actual endpoint
-            setPermissions(response.data.permissions);
-            setCanCreate(response.data.canCreate);
-            setCanEdit(response.data.canEdit);
-            setCanDelete(response.data.canDelete);
-        } catch (error) {
-            console.error('Error fetching permissions:', error);
-        }
-    };
+    const data = permissions.data || [];
+    const links = permissions.links || [];
 
-    const handleDelete = async (id) => {
+    const canCreate = true;
+    const canEdit = true;
+    const canDelete = true;
+    
+    const handleDelete = async (id: number) => {
         if (!window.confirm('Are you sure you want to delete this permission?')) return;
 
         try {
-            await axios.delete(`/api/permissions/${id}`);
-            setPermissions(permissions.filter((perm) => perm.id !== id));
+            await axios.delete(`/permissions/${id}`);
+            location.reload(); // Or use Inertia router
         } catch (error) {
             console.error('Delete failed:', error);
         }
@@ -43,11 +32,14 @@ const PermissionsPage = () => {
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-semibold text-gray-800">Permissions</h2>
                     {canCreate && (
-                        <Link to="/permissions/create" className="px-4 py-2 bg-slate-500 text-white rounded">
+                        <Link href="/permissions/create" className="px-4 py-2 bg-slate-500 text-white rounded">
                             Create
                         </Link>
                     )}
                 </div>
+
+                {flash.success && <div className="mb-4 text-green-600">{flash.success}</div>}
+                {flash.error && <div className="mb-4 text-red-600">{flash.error}</div>}
 
                 <div className="overflow-x-auto bg-white shadow rounded">
                     <table className="min-w-full border border-gray-200">
@@ -59,14 +51,14 @@ const PermissionsPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {permissions.length === 0 ? (
+                            {data.length === 0 ? (
                                 <tr>
-                                    <td colSpan="3" className="px-6 py-4 text-center">
+                                    <td colSpan={3} className="px-6 py-4 text-center">
                                         No permissions found.
                                     </td>
                                 </tr>
                             ) : (
-                                permissions.map((permission) => (
+                                data.map((permission: any) => (
                                     <tr key={permission.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 border-b">{permission.id}</td>
                                         <td className="px-6 py-4 border-b">{permission.name}</td>
@@ -74,9 +66,8 @@ const PermissionsPage = () => {
                                             <div className="flex gap-2">
                                                 {canEdit && (
                                                     <Link
-                                                        to={`/permissions/edit/${permission.id}`}
+                                                        href={`/permissions/${permission.id}/edit`}
                                                         className="bg-blue-500 text-white px-4 py-2 rounded"
-                                                        title="Edit"
                                                     >
                                                         ✏️
                                                     </Link>
@@ -85,7 +76,6 @@ const PermissionsPage = () => {
                                                     <button
                                                         onClick={() => handleDelete(permission.id)}
                                                         className="bg-red-500 text-white px-4 py-2 rounded"
-                                                        title="Delete"
                                                     >
                                                         🗑️
                                                     </button>
@@ -97,9 +87,24 @@ const PermissionsPage = () => {
                             )}
                         </tbody>
                     </table>
+
+                    {/* Pagination Links */}
+                    <div className="mt-4 flex flex-wrap gap-2 px-4 pb-4">
+                        {links.map((link: any, index: number) => (
+                            <Link
+                                key={index}
+                                href={link.url || ''}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                className={`px-3 py-1 border rounded text-sm ${
+                                    link.active
+                                        ? 'bg-slate-600 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-100'
+                                } ${!link.url ? 'pointer-events-none opacity-50' : ''}`}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
-            
         </AppLayout>
     );
 };
